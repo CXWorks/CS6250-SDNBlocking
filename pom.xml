@@ -28,10 +28,9 @@
 
     <properties>
         <onos.version>1.2.0</onos.version>
-        <!-- Uncomment to generate ONOS app from this module.
-        <onos.app.name>org.foo.app</onos.app.name>
-        <onos.app.origin>Foo, Inc.</onos.app.origin>
-        -->
+        <onos.app.name>edu.gatech.app</onos.app.name>
+        <onos.app.origin>GTCS6250, Group 10.</onos.app.origin>
+
     </properties>
 
     <dependencies>

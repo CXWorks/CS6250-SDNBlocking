@@ -15,9 +15,18 @@
  */
 package edu.gatech;
 
-import org.apache.felix.scr.annotations.Activate;
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Deactivate;
+import edu.gatech.processor.TcpPacketProcessor;
+import org.apache.felix.scr.annotations.*;
+import org.onlab.packet.Ethernet;
+import org.onlab.packet.IPv4;
+import org.onosproject.core.ApplicationId;
+import org.onosproject.core.CoreService;
+import org.onosproject.net.flow.DefaultTrafficSelector;
+import org.onosproject.net.flow.FlowRuleService;
+import org.onosproject.net.flow.TrafficSelector;
+import org.onosproject.net.packet.PacketPriority;
+import org.onosproject.net.packet.PacketProcessor;
+import org.onosproject.net.packet.PacketService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,16 +36,37 @@ import org.slf4j.LoggerFactory;
 @Component(immediate = true)
 public class AppComponent {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
+    private static final int PRIORITY = 128;
+    private static Logger log = LoggerFactory.getLogger(AppComponent.class);
+    private final PacketProcessor packetProcessor = new TcpPacketProcessor();
+    // Selector for TCP traffic that is to be intercepted
+    private final TrafficSelector intercept = DefaultTrafficSelector.builder()
+            .matchEthType(Ethernet.TYPE_IPV4)
+            .matchIPProtocol(IPv4.PROTOCOL_TCP)
+            .build();
+    @Reference(cardinality = ReferenceCardinality.MANDATORY_UNARY)
+    protected CoreService coreService;
+    @Reference(cardinality = ReferenceCardinality.MANDATORY_UNARY)
+    protected FlowRuleService flowRuleService;
+    @Reference(cardinality = ReferenceCardinality.MANDATORY_UNARY)
+    protected PacketService packetService;
+    private ApplicationId appId;
 
     @Activate
-    protected void activate() {
+    public void activate() {
+        System.out.println("activated!!!");
+        appId = coreService.registerApplication("Video Blocking");
+        packetService.addProcessor(packetProcessor, PRIORITY);
+        packetService.requestPackets(intercept, PacketPriority.CONTROL, appId);
         log.info("Started");
     }
 
     @Deactivate
-    protected void deactivate() {
+    public void deactivate() {
+        packetService.removeProcessor(packetProcessor);
+        flowRuleService.removeFlowRulesById(appId);
         log.info("Stopped");
     }
+
 
 }

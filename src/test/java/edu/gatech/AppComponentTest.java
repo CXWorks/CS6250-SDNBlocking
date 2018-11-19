@@ -28,14 +28,13 @@ public class AppComponentTest {
 
     @Before
     public void setUp() {
-        component = new AppComponent();
-        component.activate();
+
 
     }
 
     @After
     public void tearDown() {
-        component.deactivate();
+
     }
 
     @Test
