@@ -1,7 +1,9 @@
 package edu.gatech.blocking.service;
 
-import edu.gatech.blocking.model.DnsPacket;
+import io.netty.handler.codec.dns.DnsQuestion;
 import org.onlab.packet.UDP;
+
+import java.util.List;
 
 public interface DnsSnifferService {
     /**
@@ -9,5 +11,5 @@ public interface DnsSnifferService {
      * @param packet
      * @return if this is not a UDP packet, return null
      */
-    public DnsPacket sniffDnsPacket(UDP packet);
+    public List<DnsQuestion> sniffDnsPacket(UDP packet);
 }
