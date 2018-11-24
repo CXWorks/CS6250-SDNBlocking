@@ -15,14 +15,11 @@
  */
 package edu.gatech;
 
-import edu.gatech.blocking.service.DnsSnifferService;
-import edu.gatech.blocking.service.impl.DnsSnifferServiceImpl;
-import io.netty.handler.codec.dns.DnsQuestion;
+import edu.gatech.blocking.controller.MainController;
 import org.apache.felix.scr.annotations.*;
 import org.onlab.packet.*;
 import org.onosproject.core.ApplicationId;
 import org.onosproject.core.CoreService;
-import org.onosproject.net.DeviceId;
 import org.onosproject.net.flow.*;
 import org.onosproject.net.flow.criteria.Criterion;
 import org.onosproject.net.flow.criteria.EthCriterion;
@@ -33,10 +30,6 @@ import org.onosproject.net.packet.PacketProcessor;
 import org.onosproject.net.packet.PacketService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import static org.onosproject.net.flow.FlowRuleEvent.Type.RULE_REMOVED;
 import static org.onosproject.net.flow.criteria.Criterion.Type.ETH_SRC;
@@ -69,14 +62,14 @@ public class dropSource {
     private ApplicationId appId;
     private final PacketProcessor packetProcessor = new dropPacketProcessor();
     private final FlowRuleListener flowListener = new InternalFlowListener();
+    private final MainController mainController = new MainController();
 
-    private final DnsSnifferService dnsSnifferService = new DnsSnifferServiceImpl();
+
 
     private final TrafficSelector intercept = DefaultTrafficSelector.builder()
             .matchEthType(Ethernet.TYPE_IPV4).matchIPProtocol(IPv4.PROTOCOL_ICMP)
             .build();
 
-    Set<String> blockSource = new HashSet<String>();
     private static final int PRIORITY = 128;
 
     @Activate
@@ -85,7 +78,7 @@ public class dropSource {
         packetService.addProcessor(packetProcessor, PRIORITY);
         flowRuleService.addListener(flowListener);
         packetService.requestPackets(intercept, PacketPriority.CONTROL, appId);
-        blockSource.add("10.0.0.1");
+        mainController.activate();
         log.info("Drop Source");
     }
 
@@ -94,28 +87,8 @@ public class dropSource {
         packetService.removeProcessor(packetProcessor);
         flowRuleService.removeFlowRulesById(appId);
         flowRuleService.removeListener(flowListener);
+        mainController.deactivate();
         log.info("Stopped Dropping");
-    }
-
-    private void processDrop(PacketContext context, Ethernet eth) {
-        DeviceId deviceId = context.inPacket().receivedFrom().deviceId();
-
-        IPv4 ipv4IpPayload = (IPv4) eth.getPayload();
-        int ipSrcAddr = ipv4IpPayload.getSourceAddress();
-        IpAddress ipSrcAddrCon = IpAddress.valueOf(ipSrcAddr);
-        log.info("Source: " + ipSrcAddrCon.toString());
-        if (blockSource.contains(ipSrcAddrCon.toString())) {
-            log.info("Blocked Source contains " + ipSrcAddrCon.toString());
-            log.info("Dropping...");
-            context.block();
-        }
-
-    }
-
-    // Indicates whether the specified packet corresponds to ICMP ping.
-    private boolean isIcmpPing(Ethernet eth) {
-        return eth.getEtherType() == Ethernet.TYPE_IPV4 &&
-                ((IPv4) eth.getPayload()).getProtocol() == IPv4.PROTOCOL_ICMP;
     }
 
     // Intercepts packets
@@ -129,12 +102,8 @@ public class dropSource {
                 IPacket udpPacket = iPv4.getPayload();
                 if (udpPacket instanceof UDP) {
                     UDP udp = (UDP) udpPacket;
-                    List<DnsQuestion> list = dnsSnifferService.sniffDnsPacket(udp);
-                    if (list != null) {
-                        boolean shouldBlock = false;
-                        for (DnsQuestion dnsQuestion : list) {
-                            //
-                        }
+                    if (mainController.shouldBlock(udp)) {
+                        context.block();
                     }
                 }
             }
