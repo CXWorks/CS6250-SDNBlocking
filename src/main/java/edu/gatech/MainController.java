@@ -66,6 +66,13 @@ public class MainController extends HandleCommand {
 
     @Override
     public void handleCommand(String[] strings) {
+        if (strings.length == 2) {
+            if (strings[1].equalsIgnoreCase("show")) {
+                for (String s : blockSource.keySet()) {
+                    System.out.println("---->" + s);
+                }
+            }
+        }
         if (strings.length >= 3) {
             String op = strings[1];
             String host = strings[2];
@@ -73,10 +80,6 @@ public class MainController extends HandleCommand {
                 blockSource.put(host, 0);
             } else if (op.equalsIgnoreCase("del")) {
                 blockSource.remove(host);
-            } else if (op.equalsIgnoreCase("show")) {
-                for (String s : blockSource.keySet()) {
-                    System.out.println("---->" + s);
-                }
             }
         }
     }
