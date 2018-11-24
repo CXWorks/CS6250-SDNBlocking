@@ -15,11 +15,11 @@
  */
 package edu.gatech;
 
+import edu.gatech.blocking.service.DnsSnifferService;
+import edu.gatech.blocking.service.impl.DnsSnifferServiceImpl;
+import io.netty.handler.codec.dns.DnsQuestion;
 import org.apache.felix.scr.annotations.*;
-import org.onlab.packet.Ethernet;
-import org.onlab.packet.IPv4;
-import org.onlab.packet.IpAddress;
-import org.onlab.packet.MacAddress;
+import org.onlab.packet.*;
 import org.onosproject.core.ApplicationId;
 import org.onosproject.core.CoreService;
 import org.onosproject.net.DeviceId;
@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.onosproject.net.flow.FlowRuleEvent.Type.RULE_REMOVED;
@@ -68,6 +69,8 @@ public class dropSource {
     private ApplicationId appId;
     private final PacketProcessor packetProcessor = new dropPacketProcessor();
     private final FlowRuleListener flowListener = new InternalFlowListener();
+
+    private final DnsSnifferService dnsSnifferService = new DnsSnifferServiceImpl();
 
     private final TrafficSelector intercept = DefaultTrafficSelector.builder()
             .matchEthType(Ethernet.TYPE_IPV4).matchIPProtocol(IPv4.PROTOCOL_ICMP)
@@ -120,8 +123,20 @@ public class dropSource {
         @Override
         public void process(PacketContext context) {
             Ethernet eth = context.inPacket().parsed();
-            if (isIcmpPing(eth)) {
-                processDrop(context, eth);
+            IPacket iPacket = eth.getPayload();
+            if (iPacket instanceof IPv4) {
+                IPv4 iPv4 = (IPv4) iPacket;
+                IPacket udpPacket = iPv4.getPayload();
+                if (udpPacket instanceof UDP) {
+                    UDP udp = (UDP) udpPacket;
+                    List<DnsQuestion> list = dnsSnifferService.sniffDnsPacket(udp);
+                    if (list != null) {
+                        boolean shouldBlock = false;
+                        for (DnsQuestion dnsQuestion : list) {
+                            //
+                        }
+                    }
+                }
             }
         }
     }
