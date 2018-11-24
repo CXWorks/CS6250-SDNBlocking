@@ -57,7 +57,9 @@ public class MainController extends HandleCommand {
             boolean shouldBlock = false;
             for (String dnsQuestion : list) {
                 //
-                shouldBlock = shouldBlock || blockSource.containsKey(dnsQuestion);
+                for (String toblock : blockSource.keySet()) {
+                    shouldBlock = shouldBlock || dnsQuestion.contains(toblock);
+                }
             }
             return shouldBlock;
         }
