@@ -27,11 +27,10 @@
     <url>http://onosproject.org</url>
 
     <properties>
-        <onos.version>1.2.0</onos.version>
-        <!-- Uncomment to generate ONOS app from this module.
-        <onos.app.name>org.foo.app</onos.app.name>
-        <onos.app.origin>Foo, Inc.</onos.app.origin>
-        -->
+        <onos.version>1.14.0</onos.version>
+        <onos.app.name>edu.gatech.CS6250</onos.app.name>
+        <onos.app.origin>block</onos.app.origin>
+        <onos.app.title>Group10</onos.app.title>
     </properties>
 
     <dependencies>
@@ -44,6 +43,12 @@
         <dependency>
             <groupId>org.onosproject</groupId>
             <artifactId>onlab-osgi</artifactId>
+            <version>${onos.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.onosproject</groupId>
+            <artifactId>onos-cli</artifactId>
             <version>${onos.version}</version>
         </dependency>
 
@@ -69,12 +74,12 @@
             <scope>provided</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.4</version>
-            <scope>provided</scope>
-        </dependency>
+        <!--<dependency>-->
+        <!--<groupId>org.projectlombok</groupId>-->
+        <!--<artifactId>lombok</artifactId>-->
+        <!--<version>1.18.4</version>-->
+        <!--<scope>provided</scope>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>io.netty</groupId>

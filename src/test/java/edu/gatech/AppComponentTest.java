@@ -23,24 +23,23 @@ import org.junit.Test;
  * Set of tests of the ONOS application component.
  */
 public class AppComponentTest {
-
     private AppComponent component;
 
     @Before
     public void setUp() {
-        component = new AppComponent();
-        component.activate();
+
 
     }
 
     @After
     public void tearDown() {
-        component.deactivate();
+
     }
 
     @Test
     public void basics() {
 
     }
+
 
 }

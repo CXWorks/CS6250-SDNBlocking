@@ -15,7 +15,6 @@
  */
 package edu.gatech;
 
-import edu.gatech.blocking.controller.MainController;
 import org.apache.felix.scr.annotations.*;
 import org.onlab.packet.*;
 import org.onosproject.core.ApplicationId;
@@ -43,9 +42,9 @@ import static org.onosproject.net.flow.criteria.Criterion.Type.ETH_SRC;
 Base on onePing
  */
 @Component(immediate = true)
-public class dropSource {
+public class AppComponent {
 
-    private static Logger log = LoggerFactory.getLogger(dropSource.class);
+    private static Logger log = LoggerFactory.getLogger(AppComponent.class);
 
     @Reference(cardinality = ReferenceCardinality.MANDATORY_UNARY)
     protected CoreService coreService;
