@@ -3,8 +3,6 @@ package edu.gatech.blocking.service.impl;
 import edu.gatech.blocking.service.DnsSnifferService;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.handler.codec.dns.DnsQuestion;
-import io.netty.handler.codec.dns.DnsRecordDecoder;
 import org.onlab.packet.UDP;
 
 import java.util.ArrayList;
@@ -14,15 +12,15 @@ public class DnsSnifferServiceImpl implements DnsSnifferService {
     private final DnsRecordDecoder recordDecoder;
 
     public DnsSnifferServiceImpl() {
-        recordDecoder = DnsRecordDecoder.DEFAULT;
+        recordDecoder = new DnsRecordDecoder();
     }
 
     @Override
-    public List<DnsQuestion> sniffDnsPacket(UDP packet) {
+    public List<String> sniffDnsPacket(UDP packet) {
         // build the datagram packet
         byte[] bytes = packet.getPayload().serialize();
         ByteBuf byteBuf = Unpooled.wrappedBuffer(bytes);
-        List<DnsQuestion> questionList = null;
+        List<String> questionList = null;
 
         try {
             final int id = byteBuf.readUnsignedShort();
@@ -51,8 +49,8 @@ public class DnsSnifferServiceImpl implements DnsSnifferService {
         return arCount == 0 || arCount == 1 || arCount == 2;
     }
 
-    private List<DnsQuestion> decodeQuestions(ByteBuf buf, int questionCount) throws Exception {
-        List<DnsQuestion> questionList = new ArrayList<>();
+    private List<String> decodeQuestions(ByteBuf buf, int questionCount) throws Exception {
+        List<String> questionList = new ArrayList<>();
         for (int i = questionCount; i > 0; i--) {
             questionList.add(recordDecoder.decodeQuestion(buf));
         }

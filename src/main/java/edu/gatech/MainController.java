@@ -2,7 +2,6 @@ package edu.gatech;
 
 import edu.gatech.blocking.service.DnsSnifferService;
 import edu.gatech.blocking.service.impl.DnsSnifferServiceImpl;
-import io.netty.handler.codec.dns.DnsQuestion;
 import org.onlab.packet.UDP;
 import org.onosproject.cli.app.HandleCommand;
 
@@ -53,12 +52,12 @@ public class MainController extends HandleCommand {
     }
 
     public boolean shouldBlock(UDP udp) {
-        List<DnsQuestion> list = dnsSnifferService.sniffDnsPacket(udp);
+        List<String> list = dnsSnifferService.sniffDnsPacket(udp);
         if (list != null) {
             boolean shouldBlock = false;
-            for (DnsQuestion dnsQuestion : list) {
+            for (String dnsQuestion : list) {
                 //
-                shouldBlock = shouldBlock || blockSource.containsKey(dnsQuestion.name());
+                shouldBlock = shouldBlock || blockSource.containsKey(dnsQuestion);
             }
             return shouldBlock;
         }

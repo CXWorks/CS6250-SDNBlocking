@@ -74,18 +74,6 @@
             <scope>provided</scope>
         </dependency>
 
-        <!--<dependency>-->
-        <!--<groupId>org.projectlombok</groupId>-->
-        <!--<artifactId>lombok</artifactId>-->
-        <!--<version>1.18.4</version>-->
-        <!--<scope>provided</scope>-->
-        <!--</dependency>-->
-
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-codec-dns</artifactId>
-            <version>4.1.2.Final</version>
-        </dependency>
     </dependencies>
 
     <build>
