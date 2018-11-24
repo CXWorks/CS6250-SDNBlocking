@@ -30,13 +30,15 @@ public class DnsSnifferServiceImpl implements DnsSnifferService {
             final int nsCount = byteBuf.readUnsignedShort();
             final int arCount = byteBuf.readUnsignedShort();
 
-            // this is supposed to be a dns packet
-            // ref: https://stackoverflow.com/questions/7565300/identifying-dns-packets
-            if(qdCount == 1 && (flag >> 15) == 0
-                    && anCount == 0 && nsCount == 0
-                    && isPossibleArCount(arCount)
-                    && (flag & 0x000f) == 0) {
-                questionList = decodeQuestions(byteBuf, qdCount);
+            // use port 53 to check whether it is a DNS packet
+            if(packet.getSourcePort() == 53 ||
+                    packet.getDestinationPort() == 53) {
+                // extract domain names from question and answer sections
+                List<String> nameList = new ArrayList<>();
+                nameList.addAll(decodeQuestions(byteBuf, qdCount));
+                nameList.addAll(decodeAnswers(byteBuf, anCount));
+
+                questionList = nameList;
             }
         } catch (Exception e) {
             System.out.println("Exception occurs when parsing the packet");
@@ -55,5 +57,19 @@ public class DnsSnifferServiceImpl implements DnsSnifferService {
             questionList.add(recordDecoder.decodeQuestion(buf));
         }
         return questionList;
+    }
+
+    private List<String> decodeAnswers(ByteBuf buf, int count) throws Exception {
+        List<String> answerList = new ArrayList<>();
+        for (int i = count; i > 0; i --) {
+            final String r = recordDecoder.decodeRecord(buf);
+            if (r == null) {
+                // Truncated response
+                break;
+            }
+
+            answerList.add(r);
+        }
+        return answerList;
     }
 }

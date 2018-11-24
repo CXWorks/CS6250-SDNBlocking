@@ -14,6 +14,33 @@ public class DnsRecordDecoder {
         return name;
     }
 
+    public final String decodeRecord(ByteBuf in) throws Exception {
+        final int startOffset = in.readerIndex();
+        final String name = decodeName(in);
+
+        final int endOffset = in.writerIndex();
+        if (endOffset - startOffset < 10) {
+            // Not enough data
+            in.readerIndex(startOffset);
+            return null;
+        }
+
+        final int type = in.readUnsignedShort();
+        final int aClass = in.readUnsignedShort();
+        final long ttl = in.readUnsignedInt();
+        final int length = in.readUnsignedShort();
+        final int offset = in.readerIndex();
+
+        if (endOffset - offset < length) {
+            // Not enough data
+            in.readerIndex(startOffset);
+            return null;
+        }
+
+        in.readerIndex(offset + length);
+        return name;
+    }
+
     /**
      * Retrieves a domain name given a buffer containing a DNS packet. If the
      * name contains a pointer, the position of the buffer will be set to
