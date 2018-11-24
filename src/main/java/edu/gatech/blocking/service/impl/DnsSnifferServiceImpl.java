@@ -1,5 +1,6 @@
-package edu.gatech.blocking.service;
+package edu.gatech.blocking.service.impl;
 
+import edu.gatech.blocking.service.DnsSnifferService;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.dns.DnsQuestion;
@@ -9,7 +10,7 @@ import org.onlab.packet.UDP;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DnsSnifferServiceImpl implements DnsSnifferService{
+public class DnsSnifferServiceImpl implements DnsSnifferService {
     private final DnsRecordDecoder recordDecoder;
 
     public DnsSnifferServiceImpl() {
